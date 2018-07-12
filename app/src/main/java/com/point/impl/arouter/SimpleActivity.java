@@ -7,7 +7,7 @@ import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.point.impl.R;
 
-@Route(path = Const.ACTIVITY_URL_SIMPLE)
+@Route(path = Const.ACTIVITY_URL_SIMPLE, group = Const.GROUP_FIRST)
 public class SimpleActivity extends BaseActivity {
 
     @Autowired()
@@ -23,6 +23,7 @@ public class SimpleActivity extends BaseActivity {
         TextView textView = findViewById(R.id.tv_simple);
         String text = "name: " + name + ", age: " + age;
         textView.setText(text);
+        setResult(220);
     }
 
 }

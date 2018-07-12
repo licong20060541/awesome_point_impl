@@ -16,6 +16,8 @@ public class Const {
     public static final String ACTIVITY_URL_FRAGMENT = "/app/Fragment";
     public static final String ACTIVITY_URL_INTERCEPTOR = "/app/Interceptor";
 
+    public static final String GROUP_FIRST = "group_first";
+
     public static void log(String content) {
         Log.d(TAG, content);
     }

@@ -1,12 +1,13 @@
 package com.point.impl.arouter;
 
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.facade.callback.NavCallback;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.point.impl.R;
 
@@ -25,11 +26,24 @@ public class RouterActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 ARouter.getInstance()
-                        .build(Const.ACTIVITY_URL_SIMPLE)
+                        .build(Const.ACTIVITY_URL_SIMPLE, Const.GROUP_FIRST)
                         .withString("name", "licong")
                         .withInt("age", 23)
 //                        .withTransition()
-                        .navigation();
+//                        .navigation(RouterActivity.this, 123)
+                        .navigation(RouterActivity.this, new NavCallback() {
+
+                            @Override
+                            public void onFound(Postcard postcard) {
+                                super.onFound(postcard);
+                                Const.log("onFound");
+                            }
+
+                            @Override
+                            public void onArrival(Postcard postcard) {
+                                Const.log("onArrival");
+                            }
+                        });
 
 //                Uri uri = Uri.parse(Const.ACTIVITY_URL_PARSE);
 //                ARouter.getInstance().build(uri).navigation();
@@ -42,4 +56,13 @@ public class RouterActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 110:
+                Const.log("110: onActivityResult");
+                break;
+        }
+    }
 }

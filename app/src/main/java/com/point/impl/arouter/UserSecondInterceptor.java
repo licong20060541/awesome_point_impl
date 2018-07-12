@@ -1,6 +1,7 @@
 package com.point.impl.arouter;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Interceptor;
@@ -24,6 +25,10 @@ public class UserSecondInterceptor implements IInterceptor {
         Const.log(UserSecondInterceptor.class.getCanonicalName()
                 + ":process(), "
                 + Thread.currentThread().getName());
+        if (TextUtils.equals(postcard.getPath(), Const.ACTIVITY_URL_SIMPLE)) {
+            Const.log(UserSecondInterceptor.class.getCanonicalName() + ", 拦截处理");
+        }
+        callback.onContinue(postcard);
     }
     
 }
