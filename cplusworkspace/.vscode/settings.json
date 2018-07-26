@@ -8,6 +8,7 @@
         "string_view": "cpp",
         "vector": "cpp",
         "initializer_list": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "thread": "cpp"
     }
 }
