@@ -32,6 +32,18 @@ dependencies {
 
 // ******************** 注意：apply plugin: 'com.android.library' ************** //
 
+// 补充：依赖jar包处理
+
+//task makeJar(type: Jar) {
+//    archiveName = 'domob_android_sdk.jar'
+//    from('build/intermediates/classes/release/')
+//    from(project.zipTree('libs/aaa.jar'))
+//    from(project.zipTree('libs/bbb.jar'))
+//    from(project.zipTree('libs/ccc.jar'))
+//    destinationDir = file('build/lib')
+//}
+
+
 // 方法一，Good
 
 task makeJar(type: Jar) { // 删除原来的jar包
