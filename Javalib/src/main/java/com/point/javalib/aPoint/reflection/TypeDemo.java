@@ -144,7 +144,7 @@ public class TypeDemo<T, K extends Number & Serializable & Comparable> {
         Field t1Field = TypeDemo.class.getDeclaredField("t1");
         TypeVariable typeVariable = (TypeVariable) t1Field.getGenericType();
         Type[] types1 = typeVariable.getBounds();
-        for (Type t : types1) {
+        for (Type t : types1) { // class java.lang.Object
             Print.println(t.toString());
         }
         // k1
@@ -152,6 +152,9 @@ public class TypeDemo<T, K extends Number & Serializable & Comparable> {
         Field k1Field = TypeDemo.class.getDeclaredField("k1");
         typeVariable = (TypeVariable) k1Field.getGenericType();
         types1 = typeVariable.getBounds();
+        // class java.lang.Number
+        // interface java.io.Serializable
+        // interface java.lang.Comparable
         for (Type t : types1) {
             Print.println(t.toString());
         }
