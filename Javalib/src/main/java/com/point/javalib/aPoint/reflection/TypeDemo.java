@@ -3,6 +3,7 @@ package com.point.javalib.aPoint.reflection;
 import com.point.javalib.zPoint.Print;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -51,7 +52,7 @@ import java.util.Set;
  *      泛型通配符
  */
 
-public class TypeDemo<T, K extends Number & Serializable & Comparable> {
+public class TypeDemo<T, K extends Number & Serializable & Comparable, ResultType> {
 
     private List<T> list = null;
     private Set<T> set = null;
@@ -211,7 +212,157 @@ public class TypeDemo<T, K extends Number & Serializable & Comparable> {
         // 也就是说，我们定义泛型只能在一个类中这3个地方自定义泛型
         // class上定义如当前类。
 
+        new TypeDemo<>().testB();
 
+    }
+
+
+    private Callback.CommonCallback<String> callback = new Callback.CommonCallback<String>() {
+        @Override
+        public void onSuccess(String result) {
+
+        }
+
+        @Override
+        public void onError(Throwable ex, boolean isOnCallback) {
+
+        }
+
+        @Override
+        public void onCancelled(CancelledException cex) {
+
+        }
+
+        @Override
+        public void onFinished() {
+
+        }
+    };
+    private void testB() {
+
+        testC();
+
+
+        Class<?> callBackType = callback.getClass();
+        Class<?> clazz = null;
+        ParameterizedType pt = null; // ！！！
+        Type[] ats = null;
+        TypeVariable<?>[] tps = null;
+        Type ownerType = callBackType;
+        if (ownerType instanceof ParameterizedType) { // 不满足 class com.point.javalib.aPoint.reflection.TypeDemo$1
+            pt = (ParameterizedType) ownerType;
+            clazz = (Class<?>) pt.getRawType();
+            ats = pt.getActualTypeArguments();
+            tps = clazz.getTypeParameters();
+        } else {
+            clazz = (Class<?>) ownerType;
+        }
+        Class<?> declaredClass = Callback.CommonCallback.class;
+        if (declaredClass == clazz) { // 不满足
+            Print.println("same");
+        }
+        Type[] types = clazz.getGenericInterfaces(); // 只有一个
+        if (types != null) {
+            for (int i = 0; i < types.length; i++) {
+                Type t = types[i];
+                if (t instanceof ParameterizedType) { // com.point.javalib.aPoint.reflection.Callback.com.point.javalib.aPoint.reflection.Callback$CommonCallback<ResultType>
+                    Class<?> cls = (Class<?>) ((ParameterizedType) t).getRawType(); // interface com.point.javalib.aPoint.reflection.Callback$CommonCallback
+                    if (declaredClass.isAssignableFrom(cls)) { // 满足
+                        Print.println("aa");
+                    }
+                }
+            }
+        }
+    }
+
+    private void testC() {
+        // 第一次是实例对象，第二次是需要的
+        // getParameterizedType 递归一次后成功---class java.lang.String
+        Type type = getParameterizedType(callback.getClass(), Callback.CommonCallback.class, 0);
+        Print.println("end");
+    }
+
+    public static Type getParameterizedType(
+
+            final Type ownerType,
+            final Class<?> declaredClass,
+            int paramIndex) {
+
+        Class<?> clazz = null;
+        ParameterizedType pt = null; // ！！！
+        Type[] ats = null;
+        TypeVariable<?>[] tps = null;
+        if (ownerType instanceof ParameterizedType) {
+            pt = (ParameterizedType) ownerType;
+            clazz = (Class<?>) pt.getRawType();
+            ats = pt.getActualTypeArguments();
+            tps = clazz.getTypeParameters();
+        } else {
+            clazz = (Class<?>) ownerType;
+        }
+        if (declaredClass == clazz) {
+            if (ats != null) {
+                return ats[paramIndex];
+            }
+            return Object.class;
+        }
+
+        Type[] types = clazz.getGenericInterfaces();
+        if (types != null) {
+            for (int i = 0; i < types.length; i++) {
+                Type t = types[i];
+                if (t instanceof ParameterizedType) {
+                    Class<?> cls = (Class<?>) ((ParameterizedType) t).getRawType();
+                    if (declaredClass.isAssignableFrom(cls)) {
+                        try {
+                            return getTrueType(getParameterizedType(t, declaredClass, paramIndex), tps, ats);
+                        } catch (Throwable ignored) {
+                        }
+                    }
+                }
+            }
+        }
+
+        Class<?> superClass = clazz.getSuperclass(); // bbb 递归superClass
+        if (superClass != null) {
+            if (declaredClass.isAssignableFrom(superClass)) {
+                return getTrueType(
+                        getParameterizedType(clazz.getGenericSuperclass(),
+                                declaredClass, paramIndex), tps, ats);
+            }
+        }
+
+        throw new IllegalArgumentException("FindGenericType:" + ownerType +
+                ", declaredClass: " + declaredClass + ", index: " + paramIndex);
+
+    }
+
+
+    private static Type getTrueType(
+
+            Type type,
+            TypeVariable<?>[] typeVariables,
+            Type[] actualTypes) {
+
+        if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> tv = (TypeVariable<?>) type;
+            String name = tv.getName();
+            if (actualTypes != null) {
+                for (int i = 0; i < typeVariables.length; i++) {
+                    if (name.equals(typeVariables[i].getName())) {
+                        return actualTypes[i];
+                    }
+                }
+            }
+            return tv;
+
+        } else if (type instanceof GenericArrayType) {
+            Type ct = ((GenericArrayType) type).getGenericComponentType();
+            if (ct instanceof Class<?>) {
+                return Array.newInstance((Class<?>) ct, 0).getClass();
+            }
+        }
+        return type;
     }
 
 
